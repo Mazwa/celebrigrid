@@ -1,0 +1,271 @@
+{
+  "attempted": 45,
+  "done": [
+    {
+      "actor": "Samuel L. Jackson",
+      "page": "List of Samuel L. Jackson performances",
+      "rows": 150
+    },
+    {
+      "actor": "Meryl Streep",
+      "page": "Meryl Streep on screen and stage",
+      "rows": 84
+    },
+    {
+      "actor": "Jennifer Aniston",
+      "page": "List of Jennifer Aniston performances",
+      "rows": 48
+    },
+    {
+      "actor": "Scarlett Johansson",
+      "page": "Scarlett Johansson on screen and stage",
+      "rows": 65
+    },
+    {
+      "actor": "Nicole Kidman",
+      "page": "Nicole Kidman on screen and stage",
+      "rows": 76
+    },
+    {
+      "actor": "Anne Hathaway",
+      "page": "List of Anne Hathaway performances",
+      "rows": 54
+    },
+    {
+      "actor": "Jennifer Lawrence",
+      "page": "Jennifer Lawrence#Filmography",
+      "rows": 31
+    },
+    {
+      "actor": "Hugh Jackman",
+      "page": "Hugh Jackman filmography and discography",
+      "rows": 49
+    },
+    {
+      "actor": "Chris Hemsworth",
+      "page": "Chris Hemsworth#Filmography",
+      "rows": 39
+    },
+    {
+      "actor": "Chris Evans",
+      "page": "List of Chris Evans performances",
+      "rows": 52
+    },
+    {
+      "actor": "Vin Diesel",
+      "page": "Vin Diesel#Filmography",
+      "rows": 41
+    },
+    {
+      "actor": "Jason Statham",
+      "page": "Jason Statham#Film",
+      "rows": 73
+    },
+    {
+      "actor": "Daniel Craig",
+      "page": "Daniel Craig#Filmography",
+      "rows": 47
+    },
+    {
+      "actor": "Anthony Hopkins",
+      "page": "List of Anthony Hopkins performances",
+      "rows": 97
+    },
+    {
+      "actor": "Al Pacino",
+      "page": "Al Pacino on stage and screen",
+      "rows": 71
+    },
+    {
+      "actor": "Michael J. Fox",
+      "page": "Michael J. Fox",
+      "rows": 39
+    },
+    {
+      "actor": "Paul Rudd",
+      "page": "Paul Rudd on screen and stage",
+      "rows": 72
+    },
+    {
+      "actor": "Cillian Murphy",
+      "page": "Cillian Murphy on stage and screen",
+      "rows": 59
+    },
+    {
+      "actor": "Robert Pattinson",
+      "page": "Robert Pattinson#Filmography",
+      "rows": 38
+    },
+    {
+      "actor": "Chadwick Boseman",
+      "page": "Chadwick Boseman#Filmography",
+      "rows": 24
+    },
+    {
+      "actor": "Cate Blanchett",
+      "page": "Cate Blanchett on screen and stage",
+      "rows": 75
+    },
+    {
+      "actor": "Emma Stone",
+      "page": "List of Emma Stone performances",
+      "rows": 36
+    },
+    {
+      "actor": "Kate Winslet",
+      "page": "List of Kate Winslet performances",
+      "rows": 55
+    },
+    {
+      "actor": "Keira Knightley",
+      "page": "List of Keira Knightley performances",
+      "rows": 50
+    },
+    {
+      "actor": "Penelope Cruz",
+      "page": "Pen\u00e9lope Cruz filmography",
+      "rows": 74
+    },
+    {
+      "actor": "Amy Adams",
+      "page": "List of Amy Adams performances",
+      "rows": 53
+    },
+    {
+      "actor": "Viola Davis",
+      "page": "Viola Davis on screen and stage",
+      "rows": 52
+    },
+    {
+      "actor": "Whoopi Goldberg",
+      "page": "Whoopi Goldberg on screen and stage",
+      "rows": 141
+    },
+    {
+      "actor": "Jamie Lee Curtis",
+      "page": "List of Jamie Lee Curtis performances",
+      "rows": 59
+    },
+    {
+      "actor": "Sigourney Weaver",
+      "page": "List of Sigourney Weaver performances",
+      "rows": 70
+    },
+    {
+      "actor": "Michelle Pfeiffer",
+      "page": "List of Michelle Pfeiffer performances",
+      "rows": 51
+    },
+    {
+      "actor": "Glenn Close",
+      "page": "Glenn Close on screen and stage",
+      "rows": 65
+    },
+    {
+      "actor": "Diane Keaton",
+      "page": "Diane Keaton#Acting credits",
+      "rows": 61
+    },
+    {
+      "actor": "Rachel McAdams",
+      "page": "Rachel McAdams#Filmography",
+      "rows": 32
+    },
+    {
+      "actor": "Emma Watson",
+      "page": "Emma Watson#Filmography",
+      "rows": 19
+    },
+    {
+      "actor": "Kristen Stewart",
+      "page": "Kristen Stewart#Filmography",
+      "rows": 54
+    },
+    {
+      "actor": "Zoe Saldana",
+      "page": "Zoe Salda\u00f1a#Filmography",
+      "rows": 56
+    },
+    {
+      "actor": "Zendaya",
+      "page": "Zendaya#Filmography",
+      "rows": 17
+    },
+    {
+      "actor": "Anya Taylor-Joy",
+      "page": "Anya Taylor-Joy#Filmography",
+      "rows": 26
+    },
+    {
+      "actor": "Jessica Chastain",
+      "page": "List of Jessica Chastain performances",
+      "rows": 44
+    },
+    {
+      "actor": "Brie Larson",
+      "page": "List of Brie Larson performances",
+      "rows": 41
+    },
+    {
+      "actor": "Emily Blunt",
+      "page": "List of Emily Blunt performances",
+      "rows": 44
+    }
+  ],
+  "failed": [
+    {
+      "actor": "Chris Pratt",
+      "error": "no movie rows parsed"
+    },
+    {
+      "actor": "Timothee Chalamet",
+      "error": "no movie rows parsed"
+    },
+    {
+      "actor": "Uma Thurman",
+      "error": "no movie rows parsed"
+    }
+  ],
+  "photo_failed": [
+    {
+      "actor": "Chris Evans",
+      "error": "no image url"
+    },
+    {
+      "actor": "Anthony Hopkins",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Cate Blanchett",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Emma Stone",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Penelope Cruz",
+      "error": "no image url"
+    },
+    {
+      "actor": "Amy Adams",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Sigourney Weaver",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Zoe Saldana",
+      "error": "no image url"
+    },
+    {
+      "actor": "Anya Taylor-Joy",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "actor": "Jessica Chastain",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    }
+  ]
+}

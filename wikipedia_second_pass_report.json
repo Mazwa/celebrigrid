@@ -1,0 +1,187 @@
+{
+  "attempted": 45,
+  "done": [],
+  "failed": [
+    {
+      "actor": "Samuel L. Jackson",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Meryl Streep",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Jennifer Aniston",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Scarlett Johansson",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Nicole Kidman",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Anne Hathaway",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Jennifer Lawrence",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Hugh Jackman",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Chris Hemsworth",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Chris Evans",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Vin Diesel",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Jason Statham",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Daniel Craig",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Anthony Hopkins",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Al Pacino",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Michael J. Fox",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Chris Pratt",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Paul Rudd",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Cillian Murphy",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Robert Pattinson",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Timothee Chalamet",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Chadwick Boseman",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Cate Blanchett",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Emma Stone",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Kate Winslet",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Keira Knightley",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Penelope Cruz",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Amy Adams",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Viola Davis",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Whoopi Goldberg",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Jamie Lee Curtis",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Sigourney Weaver",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Michelle Pfeiffer",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Glenn Close",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Diane Keaton",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Uma Thurman",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Rachel McAdams",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Emma Watson",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Kristen Stewart",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Zoe Saldana",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Zendaya",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Anya Taylor-Joy",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Jessica Chastain",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Brie Larson",
+      "error": "No movie rows parsed"
+    },
+    {
+      "actor": "Emily Blunt",
+      "error": "No movie rows parsed"
+    }
+  ],
+  "photo_failed": []
+}

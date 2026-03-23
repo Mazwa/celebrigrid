@@ -1,0 +1,47 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CelebriGrid (Dev)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>CelebriGrid</h1>
+        <p id="subtitle" class="subtitle">Daily board</p>
+      </div>
+      <div class="status" id="status"></div>
+    </header>
+
+    <section class="board-wrap">
+      <div id="missBar" class="miss-bar" aria-label="Miss indicators"></div>
+      <div id="boardStage" class="board-stage">
+        <svg id="traceLayer" class="trace-layer" aria-hidden="true"></svg>
+        <div id="popupLayer" class="popup-layer" aria-hidden="true"></div>
+        <div id="endgameModal" class="endgame-modal" role="dialog" aria-live="polite" aria-hidden="true" hidden>
+          <button id="closeEndgameBtn" class="close-endgame-btn" type="button" aria-label="Close share window">X</button>
+          <p id="endgameMessage" class="endgame-message"></p>
+          <a id="endgameLink" class="endgame-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+          <button id="shareBtnModal" type="button" hidden disabled>Share Result</button>
+        </div>
+        <div id="grid" class="grid" aria-label="5 by 5 actor grid"></div>
+      </div>
+      <div id="shareDock" class="share-dock" hidden aria-hidden="true">
+        <p id="shareDockMessage" class="share-dock-message"></p>
+        <a id="shareDockLink" class="endgame-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <button id="shareBtnDock" type="button" hidden disabled>Share Result</button>
+      </div>
+    </section>
+
+    <section class="controls">
+      <p id="instruction">Use arrow keys or drag your current actor onto an adjacent actor.</p>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

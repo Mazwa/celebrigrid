@@ -1,0 +1,381 @@
+﻿:root {
+  --bg: #0e121a;
+  --surface: #1a2230;
+  --ink: #e6ecf4;
+  --muted: #a8b1bf;
+  --accent: #5ab2d9;
+  --accent-soft: #203342;
+  --danger: #b42318;
+  --win: #1f7a4a;
+  --cell: #202938;
+  --cell-active: #2b3f54;
+  --cell-target: #405b73;
+  --cell-size: 90px;
+  --grid-gap: 3.35rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 15%, #2b3547 0%, transparent 35%),
+    radial-gradient(circle at 85% 5%, #263144 0%, transparent 30%),
+    linear-gradient(160deg, #07090d 0%, var(--bg) 50%, #080b11 100%);
+  color: var(--ink);
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+h1 {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.status {
+  min-width: 220px;
+  text-align: right;
+  font-weight: 700;
+}
+
+.board-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.miss-bar {
+  display: flex;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.miss-box {
+  width: 24px;
+  height: 14px;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: #1f7a4a;
+  box-shadow: 0 0 10px rgba(31, 122, 74, 0.28);
+}
+
+.miss-box.spent {
+  background: #b42318;
+  box-shadow: 0 0 10px rgba(180, 35, 24, 0.35);
+}
+
+.board-stage {
+  position: relative;
+  width: max-content;
+  border: 12px solid #1f2735;
+  border-radius: 1.05rem;
+  padding: 1.15rem;
+  background: linear-gradient(180deg, #141b27 0%, #0f151f 100%);
+  box-shadow:
+    0 0 0 2px #3b4b63 inset,
+    0 0 0 10px rgba(13, 19, 30, 0.82) inset,
+    0 20px 45px rgba(0, 0, 0, 0.45);
+}
+
+.trace-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.popup-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.endgame-modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(32%, 280px);
+  min-width: 180px;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.55rem;
+  background: rgba(241, 246, 255, 0.97);
+  border: 2px solid #223750;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.35) inset,
+    0 12px 28px rgba(0, 0, 0, 0.55);
+  z-index: 4;
+  display: none;
+  flex-direction: column;
+  gap: 0.42rem;
+  align-items: center;
+  text-align: center;
+}
+
+.close-endgame-btn {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #2f4663;
+  background: #dde9f9;
+  color: #12253c;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.endgame-modal.visible {
+  display: flex;
+}
+
+.endgame-message {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #111a25;
+}
+
+.endgame-link {
+  color: #0e4f8a;
+  text-decoration: underline;
+  font-size: 0.78rem;
+}
+
+.share-dock {
+  margin-top: 0.65rem;
+  width: max-content;
+  max-width: 100%;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid #3a4f6b;
+  background: rgba(225, 236, 251, 0.95);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.share-dock-message {
+  margin: 0;
+  color: #12253c;
+  font-size: 0.78rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, var(--cell-size));
+  gap: var(--grid-gap);
+  position: relative;
+  z-index: 1;
+}
+
+.cell {
+  border: 2px solid #2f3238;
+  border-radius: 0.5rem;
+  background: var(--cell);
+  padding: 0;
+  min-height: calc(var(--cell-size) + 22px);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.actor-photo {
+  width: 100%;
+  height: var(--cell-size);
+  object-fit: cover;
+  display: block;
+}
+
+.actor-photo.hidden {
+  display: none;
+}
+
+.actor-name {
+  display: block;
+  padding: 0.18rem 0.25rem 0.22rem;
+  background: #151c29;
+  color: #eaf1fa;
+  font-size: 0.62rem;
+  line-height: 1.1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell.active {
+  background: var(--cell-active);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  animation: activePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes activePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(90, 178, 217, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(90, 178, 217, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(90, 178, 217, 0.2);
+  }
+}
+
+.cell.target {
+  background: var(--cell-target);
+}
+
+.cell.drag-ready {
+  outline: 3px dashed #1f7a4a;
+  outline-offset: -4px;
+}
+
+.move-popup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 250, 242, 0.98);
+  border: 2px solid #2f3238;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #141821;
+  text-align: center;
+  max-width: 180px;
+  white-space: pre-line;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+.move-popup.good {
+  border-color: #0b7b42;
+  color: #08552e;
+  background: rgba(231, 255, 240, 0.98);
+}
+
+.move-popup.bad {
+  border-color: #b42318;
+  color: #7f1710;
+  background: rgba(255, 236, 233, 0.98);
+}
+
+.move-popup.hint {
+  border-color: #2d7dc0;
+  color: #2d7dc0;
+  background: rgba(234, 245, 255, 0.95);
+}
+
+.move-popup.temporary {
+  animation: fadeOutPopup 2s linear forwards;
+}
+
+.move-popup.temporary-long {
+  animation: fadeOutPopupLong 6s linear forwards;
+}
+
+@keyframes fadeOutPopup {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOutPopupLong {
+  0% {
+    opacity: 1;
+  }
+  83.33% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+#instruction {
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  border: none;
+  border-radius: 0.45rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 680px) {
+  :root {
+    --cell-size: 68px;
+    --grid-gap: 1.7rem;
+  }
+
+  .topbar,
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .status {
+    text-align: left;
+  }
+
+  .cell {
+    border-radius: 0.4rem;
+  }
+
+  .actor-name {
+    font-size: 0.54rem;
+  }
+}
