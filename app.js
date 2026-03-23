@@ -1245,8 +1245,8 @@ function onBoardPointerCancel(e) {
 
 function createShareText() {
   const guessBoxes = Array.from({ length: MAX_MISSES }, (_, i) => (i < state.failedMoves ? "🟥" : "🟩")).join("");
-  const titleLink = `[CelebriGrid #${state.dayNumber}](${SHARE_GAME_URL})`;
-  return [titleLink, guessBoxes].join("\n");
+  const title = `CelebriGrid #${state.dayNumber}`;
+  return [title, SHARE_GAME_URL, guessBoxes].join("\n");
 }
 
 async function onShare() {
