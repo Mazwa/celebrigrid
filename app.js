@@ -5,8 +5,8 @@ const FAKE_ROUNDS = 10;
 const FAKE_MOVIES_PER_ROUND = 10;
 const SOLVER_ATTEMPTS = 220;
 const SHARE_GAME_URL = "https://mazwa.github.io/celebrigrid/";
-const LS_FIRST_DAY_KEY = "celebrigrid.first_day";
-const LS_DAILY_BOARD_PREFIX = "celebrigrid.board.";
+const DAILY_EPOCH_KEY = "2026-03-23";
+const DAILY_BOARD_VERSION = 2;
 
 const FAKE_ACTORS = Array.from({ length: ACTOR_COUNT }, (_, i) => `Actor ${String(i + 1).padStart(2, "0")}`);
 
@@ -101,17 +101,33 @@ function neighbors(index) {
   return out;
 }
 
-function shuffle(arr) {
+function createSeededRng(seedText) {
+  let state = 2166136261;
+  for (let i = 0; i < seedText.length; i += 1) {
+    state ^= seedText.charCodeAt(i);
+    state = Math.imul(state, 16777619);
+  }
+
+  return function nextRandom() {
+    state += 0x6d2b79f5;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffle(arr, rng = Math.random) {
   for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
 
-function sampleShuffled(arr, n) {
-  if (arr.length <= n) return shuffle([...arr]);
-  return shuffle([...arr]).slice(0, n);
+function sampleShuffled(arr, n, rng = Math.random) {
+  if (arr.length <= n) return shuffle([...arr], rng);
+  return shuffle([...arr], rng).slice(0, n);
 }
 
 function setStatus(text, tone = "normal") {
@@ -158,83 +174,48 @@ function closeEndgameModalToDock() {
   shareBtnDock.disabled = false;
 }
 
-function todayKeyLocal() {
+function todayKeyUtc() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-function parseLocalDateKey(key) {
+function parseUtcDateKey(key) {
   const [y, m, d] = key.split("-").map((v) => Number.parseInt(v, 10));
-  return new Date(y, m - 1, d);
+  return Date.UTC(y, m - 1, d);
 }
 
-function dayIndexFromFirstDay(todayKey) {
-  const stored = localStorage.getItem(LS_FIRST_DAY_KEY);
-  if (!stored) {
-    localStorage.setItem(LS_FIRST_DAY_KEY, todayKey);
-    return 1;
-  }
-
-  const first = parseLocalDateKey(stored);
-  const today = parseLocalDateKey(todayKey);
-  const diffMs = today.getTime() - first.getTime();
+function dayIndexFromEpoch(todayKey) {
+  const first = parseUtcDateKey(DAILY_EPOCH_KEY);
+  const today = parseUtcDateKey(todayKey);
+  const diffMs = today - first;
   const diffDays = Math.floor(diffMs / 86400000);
-  return diffDays + 1;
+  return Math.max(1, diffDays + 1);
 }
 
-function loadOrCreateDailyBoard() {
-  const todayKey = todayKeyLocal();
-  const dayNumber = dayIndexFromFirstDay(todayKey);
-  const storageKey = `${LS_DAILY_BOARD_PREFIX}${todayKey}`;
-  const savedRaw = localStorage.getItem(storageKey);
-
-  if (savedRaw) {
-    try {
-      const saved = JSON.parse(savedRaw);
-      if (
-        Array.isArray(saved.actorsByCell) &&
-        saved.actorsByCell.length === GRID_SIZE * GRID_SIZE &&
-        Array.isArray(saved.path)
-      ) {
-        return {
-          actorsByCell: saved.actorsByCell,
-          path: saved.path,
-          dayNumber,
-          dayDateKey: todayKey,
-          source: "saved"
-        };
-      }
-    } catch (_err) {
-      // Ignore invalid saved payload and regenerate below.
-    }
-  }
-
+function loadDailyBoard() {
+  const todayKey = todayKeyUtc();
+  const dayNumber = dayIndexFromEpoch(todayKey);
+  const seed = `${DAILY_BOARD_VERSION}:${todayKey}:${runtime.sourceType}:${runtime.csvDataset?.sharedPairCount || 0}`;
+  const rng = createSeededRng(seed);
   const generated =
     runtime.sourceType === "csv" && runtime.csvDataset
-      ? generateBoardFromDataset(runtime.csvDataset)
-      : generateFakeBoardState();
-
-  localStorage.setItem(
-    storageKey,
-    JSON.stringify({
-      actorsByCell: generated.actorsByCell,
-      path: generated.path
-    })
-  );
+      ? generateBoardFromDataset(runtime.csvDataset, rng)
+      : generateFakeBoardState(rng);
 
   return {
     actorsByCell: generated.actorsByCell,
     path: generated.path,
+    sharedMoviesByPair: generated.sharedMoviesByPair,
     dayNumber,
     dayDateKey: todayKey,
-    source: "generated"
+    source: "seeded"
   };
 }
 
-function generatePath() {
+function generatePath(rng = Math.random) {
   const start = 0;
   const end = GRID_SIZE * GRID_SIZE - 1;
   const minLen = 10;
@@ -243,7 +224,7 @@ function generatePath() {
   function dfs(current, visited, path) {
     if (current === end && path.length >= minLen) return path.slice();
 
-    const candidates = shuffle(neighbors(current).filter((n) => !visited.has(n)));
+    const candidates = shuffle(neighbors(current).filter((n) => !visited.has(n)), rng);
     for (const n of candidates) {
       visited.add(n);
       path.push(n);
@@ -472,7 +453,7 @@ function buildForbiddenAndRequired(path, actorsByCell) {
   return { required, forbidden };
 }
 
-function scheduleMovies(requiredPairs, forbiddenPairs) {
+function scheduleMovies(requiredPairs, forbiddenPairs, rng = Math.random) {
   const actorIdx = new Map(FAKE_ACTORS.map((a, i) => [a, i]));
   const required = [...requiredPairs].map((key) => key.split("||"));
 
@@ -486,7 +467,7 @@ function scheduleMovies(requiredPairs, forbiddenPairs) {
 
     for (let round = 0; round < FAKE_ROUNDS && valid; round += 1) {
       const bins = Array.from({ length: FAKE_MOVIES_PER_ROUND }, () => []);
-      const order = shuffle([...FAKE_ACTORS]);
+      const order = shuffle([...FAKE_ACTORS], rng);
 
       for (const actor of order) {
         const choices = [];
@@ -498,7 +479,7 @@ function scheduleMovies(requiredPairs, forbiddenPairs) {
           valid = false;
           break;
         }
-        const chosen = choices[Math.floor(Math.random() * choices.length)];
+        const chosen = choices[Math.floor(rng() * choices.length)];
         bins[chosen].push(actor);
         assign[actorIdx.get(actor)][round] = chosen;
       }
@@ -543,8 +524,8 @@ function scheduleMovies(requiredPairs, forbiddenPairs) {
         return movies;
       }
 
-      const [a, b] = missing[Math.floor(Math.random() * missing.length)];
-      const targetRound = Math.floor(Math.random() * FAKE_ROUNDS);
+      const [a, b] = missing[Math.floor(rng() * missing.length)];
+      const targetRound = Math.floor(rng() * FAKE_ROUNDS);
       const targetBin = assign[actorIdx.get(b)][targetRound];
       if (assign[actorIdx.get(a)][targetRound] === targetBin) continue;
       if (canMove(a, targetRound, targetBin)) {
@@ -566,14 +547,14 @@ function rowsFromMovies(movies) {
   return rows;
 }
 
-function generateFakeBoardState() {
+function generateFakeBoardState(rng = Math.random) {
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    const actorsByCell = shuffle([...FAKE_ACTORS]);
-    const path = generatePath();
+    const actorsByCell = shuffle([...FAKE_ACTORS], rng);
+    const path = generatePath(rng);
     const { required, forbidden } = buildForbiddenAndRequired(path, actorsByCell);
 
     try {
-      const movies = scheduleMovies(required, forbidden);
+      const movies = scheduleMovies(required, forbidden, rng);
       const rows = rowsFromMovies(movies);
       const castByCredit = new Map();
       for (const row of rows) {
@@ -608,7 +589,7 @@ function generateFakeBoardState() {
   throw new Error("Failed to generate fake board after multiple attempts.");
 }
 
-function pickCandidatePool(dataset, desiredSize) {
+function pickCandidatePool(dataset, desiredSize, rng = Math.random) {
   const actorsWithDegree = dataset.actors.filter((actor) => (dataset.coStars.get(actor)?.size || 0) > 0);
   const mediumDegree = actorsWithDegree.filter((actor) => {
     const degree = dataset.coStars.get(actor).size;
@@ -617,10 +598,10 @@ function pickCandidatePool(dataset, desiredSize) {
 
   const source = mediumDegree.length >= ACTOR_COUNT ? mediumDegree : actorsWithDegree;
   const size = Math.min(desiredSize, source.length);
-  return sampleShuffled(source, size);
+  return sampleShuffled(source, size, rng);
 }
 
-function assignActorsToBoard(path, constraints, dataset, pool) {
+function assignActorsToBoard(path, constraints, dataset, pool, rng = Math.random) {
   const assigned = Array(GRID_SIZE * GRID_SIZE).fill(null);
   const used = new Set();
   const allCells = [];
@@ -662,7 +643,7 @@ function assignActorsToBoard(path, constraints, dataset, pool) {
     for (const actor of pool) {
       if (fits(cell, actor)) list.push(actor);
     }
-    return shuffle(list);
+    return shuffle(list, rng);
   }
 
   function search(depth) {
@@ -697,19 +678,19 @@ function assignActorsToBoard(path, constraints, dataset, pool) {
   return search(0) ? assigned : null;
 }
 
-function generateBoardFromDataset(dataset) {
+function generateBoardFromDataset(dataset, rng = Math.random) {
   if (!dataset || dataset.actors.length < ACTOR_COUNT) {
     throw new Error(`Dataset needs at least ${ACTOR_COUNT} unique actors.`);
   }
 
   for (let attempt = 0; attempt < SOLVER_ATTEMPTS; attempt += 1) {
-    const path = generatePath();
+    const path = generatePath(rng);
     const constraints = buildCellEdgeConstraints(path);
     const poolSize = 180 + (attempt % 4) * 20;
-    const pool = pickCandidatePool(dataset, poolSize);
+    const pool = pickCandidatePool(dataset, poolSize, rng);
     if (pool.length < ACTOR_COUNT) continue;
 
-    const actorsByCell = assignActorsToBoard(path, constraints, dataset, pool);
+    const actorsByCell = assignActorsToBoard(path, constraints, dataset, pool, rng);
     if (!actorsByCell) continue;
 
     const uniquePathCount = countWinningPaths(actorsByCell, dataset.sharedMoviesByPair);
@@ -984,6 +965,8 @@ function renderGrid() {
     cell.addEventListener("drop", onDrop);
     cell.addEventListener("dragenter", onDragEnter);
     cell.addEventListener("dragleave", onDragLeave);
+    cell.addEventListener("click", onCellClick);
+    cell.addEventListener("pointerdown", onCellPointerDown);
     gridEl.appendChild(cell);
   }
 
@@ -1003,6 +986,27 @@ function addTrace(from, to, valid, kind = "move") {
 
 function clearDragPreview() {
   state.dragPreview = null;
+  renderTraceLayer();
+}
+
+function updateDragPreviewFromPoint(clientX, clientY, fromIndex = state.currentIndex) {
+  const stageRect = boardStageEl.getBoundingClientRect();
+  state.dragPreview.x = clientX - stageRect.left;
+  state.dragPreview.y = clientY - stageRect.top;
+
+  const targetEl = document.elementFromPoint(clientX, clientY);
+  const cellEl = targetEl ? targetEl.closest(".cell") : null;
+  if (!cellEl || !gridEl.contains(cellEl)) {
+    state.dragPreview.to = getNearestAdjacentCellFromPoint(clientX, clientY, fromIndex);
+  } else {
+    const idx = Number(cellEl.dataset.index);
+    if (isAdjacent(fromIndex, idx)) {
+      state.dragPreview.to = idx;
+    } else {
+      state.dragPreview.to = getNearestAdjacentCellFromPoint(clientX, clientY, fromIndex);
+    }
+  }
+
   renderTraceLayer();
 }
 
@@ -1133,24 +1137,7 @@ function onDragEnd() {
 
 function onDocumentDragOver(e) {
   if (!state.dragPreview) return;
-  const stageRect = boardStageEl.getBoundingClientRect();
-  state.dragPreview.x = e.clientX - stageRect.left;
-  state.dragPreview.y = e.clientY - stageRect.top;
-
-  const targetEl = document.elementFromPoint(e.clientX, e.clientY);
-  const cellEl = targetEl ? targetEl.closest(".cell") : null;
-  if (!cellEl || !gridEl.contains(cellEl)) {
-    state.dragPreview.to = getNearestAdjacentCellFromPoint(e.clientX, e.clientY, state.currentIndex);
-  } else {
-    const idx = Number(cellEl.dataset.index);
-    if (isAdjacent(state.currentIndex, idx)) {
-      state.dragPreview.to = idx;
-    } else {
-      state.dragPreview.to = getNearestAdjacentCellFromPoint(e.clientX, e.clientY, state.currentIndex);
-    }
-  }
-
-  renderTraceLayer();
+  updateDragPreviewFromPoint(e.clientX, e.clientY, state.currentIndex);
 }
 
 function onDragOver(e) {
@@ -1201,6 +1188,53 @@ function onDragLeave(e) {
   e.currentTarget.classList.remove("drag-ready");
 }
 
+function onCellClick(e) {
+  const idx = Number(e.currentTarget.dataset.index);
+  if (state.finished || idx === state.currentIndex || !isAdjacent(state.currentIndex, idx)) return;
+  e.stopPropagation();
+  tryMove(idx);
+}
+
+function isTouchPointer(e) {
+  return e.pointerType === "touch" || e.pointerType === "pen";
+}
+
+function onCellPointerDown(e) {
+  if (!isTouchPointer(e) || state.finished) return;
+  const idx = Number(e.currentTarget.dataset.index);
+  if (idx !== state.currentIndex) return;
+
+  e.preventDefault();
+  state.dragPreview = { from: idx, to: null, x: 0, y: 0, pointerId: e.pointerId };
+  updateDragPreviewFromPoint(e.clientX, e.clientY, idx);
+}
+
+function onBoardPointerMove(e) {
+  if (!state.dragPreview || !isTouchPointer(e) || state.dragPreview.pointerId !== e.pointerId) return;
+  e.preventDefault();
+  updateDragPreviewFromPoint(e.clientX, e.clientY, state.dragPreview.from);
+}
+
+function finishPointerDrag(pointerId, commitMove) {
+  if (!state.dragPreview || state.dragPreview.pointerId !== pointerId) return;
+  const from = state.dragPreview.from;
+  const to = state.dragPreview.to;
+  clearDragPreview();
+  if (commitMove && from === state.currentIndex && Number.isInteger(to) && isAdjacent(from, to)) {
+    tryMove(to);
+  }
+}
+
+function onBoardPointerUp(e) {
+  if (!isTouchPointer(e)) return;
+  finishPointerDrag(e.pointerId, true);
+}
+
+function onBoardPointerCancel(e) {
+  if (!isTouchPointer(e)) return;
+  finishPointerDrag(e.pointerId, false);
+}
+
 function createShareText() {
   const guessBoxes = Array.from({ length: MAX_MISSES }, (_, i) => (i < state.failedMoves ? "🟥" : "🟩")).join("");
   const titleLink = `[CelebriGrid #${state.dayNumber}](${SHARE_GAME_URL})`;
@@ -1238,22 +1272,12 @@ async function onShare() {
 
 function resetGame() {
   try {
-    let generated;
-    let dayInfo;
-    if (runtime.sourceType === "csv" && runtime.csvDataset) {
-      dayInfo = loadOrCreateDailyBoard();
-      generated = {
-        actorsByCell: dayInfo.actorsByCell,
-        path: dayInfo.path,
-        sharedMoviesByPair: runtime.csvDataset.sharedMoviesByPair
-      };
-    } else {
-      generated = generateFakeBoardState();
-      dayInfo = {
-        dayNumber: dayIndexFromFirstDay(todayKeyLocal()),
-        dayDateKey: todayKeyLocal()
-      };
-    }
+    const dayInfo = loadDailyBoard();
+    const generated = {
+      actorsByCell: dayInfo.actorsByCell,
+      path: dayInfo.path,
+      sharedMoviesByPair: dayInfo.sharedMoviesByPair
+    };
 
     state.boardId = dayInfo.dayDateKey;
     state.dayNumber = dayInfo.dayNumber;
@@ -1320,6 +1344,9 @@ shareBtnDock.addEventListener("click", onShare);
 closeEndgameBtn.addEventListener("click", closeEndgameModalToDock);
 boardStageEl.addEventListener("dragover", onBoardDragOver);
 boardStageEl.addEventListener("drop", onBoardDrop);
+boardStageEl.addEventListener("pointermove", onBoardPointerMove);
+boardStageEl.addEventListener("pointerup", onBoardPointerUp);
+boardStageEl.addEventListener("pointercancel", onBoardPointerCancel);
 boardStageEl.addEventListener("click", onBoardClickReplay);
 
 (async function init() {

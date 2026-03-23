@@ -20,6 +20,7 @@
 
 body {
   margin: 0;
+  min-height: 100dvh;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   background:
     radial-gradient(circle at 15% 15%, #2b3547 0%, transparent 35%),
@@ -32,6 +33,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 1rem;
+  min-height: 100dvh;
 }
 
 .topbar {
@@ -84,6 +86,7 @@ h1 {
 .board-stage {
   position: relative;
   width: max-content;
+  max-width: 100%;
   border: 12px solid #1f2735;
   border-radius: 1.05rem;
   padding: 1.15rem;
@@ -201,6 +204,7 @@ h1 {
   position: relative;
   overflow: hidden;
   user-select: none;
+  -webkit-user-select: none;
   display: flex;
   flex-direction: column;
 }
@@ -357,8 +361,17 @@ button[disabled] {
 
 @media (max-width: 680px) {
   :root {
-    --cell-size: 68px;
-    --grid-gap: 1.7rem;
+    --cell-size: clamp(48px, 16vw, 68px);
+    --grid-gap: clamp(0.35rem, 2.2vw, 0.9rem);
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .app {
+    max-width: 100%;
+    padding: 0.65rem;
   }
 
   .topbar,
@@ -368,7 +381,24 @@ button[disabled] {
   }
 
   .status {
+    min-width: 0;
     text-align: left;
+  }
+
+  .board-wrap {
+    overflow: visible;
+  }
+
+  .board-stage {
+    width: 100%;
+    border-width: 8px;
+    border-radius: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .grid {
+    width: 100%;
+    justify-content: center;
   }
 
   .cell {
@@ -377,5 +407,18 @@ button[disabled] {
 
   .actor-name {
     font-size: 0.54rem;
+  }
+
+  .move-popup {
+    max-width: 140px;
+    font-size: 0.68rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .board-stage,
+  .cell,
+  .actor-photo {
+    touch-action: none;
   }
 }
