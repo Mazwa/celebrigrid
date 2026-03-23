@@ -984,6 +984,11 @@ function addTrace(from, to, valid, kind = "move") {
   state.traces.push({ from, to, valid, kind });
 }
 
+function hasRepeatedFailedMove(from, to) {
+  const key = edgeKey(from, to);
+  return state.traces.some((trace) => !trace.valid && trace.kind === "move" && edgeKey(trace.from, trace.to) === key);
+}
+
 function clearDragPreview() {
   state.dragPreview = null;
   renderTraceLayer();
@@ -1020,10 +1025,13 @@ function tryMove(toIndex) {
   const shared = state.sharedMoviesByPair.get(pairKey(fromActor, toActor));
 
   if (!shared || shared.length === 0) {
+    const isRepeatFailure = hasRepeatedFailedMove(fromIndex, toIndex);
     addTrace(fromIndex, toIndex, false);
     addPopup(fromIndex, toIndex, "No shared movie", "bad");
-    state.missesLeft -= 1;
-    state.failedMoves += 1;
+    if (!isRepeatFailure) {
+      state.missesLeft -= 1;
+      state.failedMoves += 1;
+    }
 
     if (state.missesLeft <= 0) {
       state.finished = true;
