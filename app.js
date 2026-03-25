@@ -6,7 +6,7 @@ const FAKE_MOVIES_PER_ROUND = 10;
 const SOLVER_ATTEMPTS = 220;
 const SHARE_GAME_URL = "https://mazwa.github.io/celebrigrid/";
 const DAILY_EPOCH_KEY = "2026-03-23";
-const DAILY_BOARD_VERSION = 2;
+const DAILY_BOARD_VERSION = 3;
 
 const FAKE_ACTORS = Array.from({ length: ACTOR_COUNT }, (_, i) => `Actor ${String(i + 1).padStart(2, "0")}`);
 
@@ -174,11 +174,17 @@ function closeEndgameModalToDock() {
   shareBtnDock.disabled = false;
 }
 
-function todayKeyUtc() {
+function todayKeyEastern() {
   const d = new Date();
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(d);
+  const y = parts.find((part) => part.type === "year")?.value;
+  const m = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
   return `${y}-${m}-${day}`;
 }
 
@@ -196,7 +202,7 @@ function dayIndexFromEpoch(todayKey) {
 }
 
 function loadDailyBoard() {
-  const todayKey = todayKeyUtc();
+  const todayKey = todayKeyEastern();
   const dayNumber = dayIndexFromEpoch(todayKey);
   const seed = `${DAILY_BOARD_VERSION}:${todayKey}:${runtime.sourceType}:${runtime.csvDataset?.sharedPairCount || 0}`;
   const rng = createSeededRng(seed);
@@ -294,6 +300,24 @@ function countWinningPaths(actorsByCell, sharedMoviesByPair) {
 
   dfs(start);
   return count;
+}
+
+function hasUniqueMoviePathConflict(path, actorsByCell, sharedMoviesByPair) {
+  const uniqueSingles = new Set();
+
+  for (let i = 0; i < path.length - 1; i += 1) {
+    const fromActor = actorsByCell[path[i]];
+    const toActor = actorsByCell[path[i + 1]];
+    const shared = sharedMoviesByPair.get(pairKey(fromActor, toActor)) || [];
+    if (shared.length !== 1) continue;
+
+    const onlyMovie = shared[0];
+    const key = movieCreditKey(onlyMovie.title, onlyMovie.year);
+    if (uniqueSingles.has(key)) return true;
+    uniqueSingles.add(key);
+  }
+
+  return false;
 }
 
 function normalizeCastMember(member) {
@@ -572,6 +596,7 @@ function generateFakeBoardState(rng = Math.random) {
       }
       const countOk = [...actorCounts.values()].every((n) => n === 10);
       if (!countOk) continue;
+      if (hasUniqueMoviePathConflict(path, actorsByCell, dataset.sharedMoviesByPair)) continue;
 
       const uniquePathCount = countWinningPaths(actorsByCell, dataset.sharedMoviesByPair);
       if (uniquePathCount !== 1) continue;
@@ -692,6 +717,7 @@ function generateBoardFromDataset(dataset, rng = Math.random) {
 
     const actorsByCell = assignActorsToBoard(path, constraints, dataset, pool, rng);
     if (!actorsByCell) continue;
+    if (hasUniqueMoviePathConflict(path, actorsByCell, dataset.sharedMoviesByPair)) continue;
 
     const uniquePathCount = countWinningPaths(actorsByCell, dataset.sharedMoviesByPair);
     if (uniquePathCount !== 1) continue;
