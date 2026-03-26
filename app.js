@@ -1006,13 +1006,37 @@ function updateStatusLine() {
   renderMissBar();
 }
 
-function addTrace(from, to, valid, kind = "move") {
-  state.traces.push({ from, to, valid, kind });
+function addTrace(from, to, valid, kind = "move", charged = false) {
+  state.traces.push({ from, to, valid, kind, charged });
 }
 
 function hasRepeatedFailedMove(from, to) {
   const key = edgeKey(from, to);
   return state.traces.some((trace) => !trace.valid && trace.kind === "move" && edgeKey(trace.from, trace.to) === key);
+}
+
+function getMoveStreakStats() {
+  const moveTraces = state.traces.filter((trace) => trace.kind === "move");
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let openingStreak = 0;
+  let firstChargedMissSeen = false;
+
+  for (const trace of moveTraces) {
+    if (trace.valid) {
+      currentStreak += 1;
+      if (!firstChargedMissSeen) openingStreak += 1;
+      if (currentStreak > longestStreak) longestStreak = currentStreak;
+      continue;
+    }
+
+    if (trace.charged) {
+      firstChargedMissSeen = true;
+      currentStreak = 0;
+    }
+  }
+
+  return { longestStreak, openingStreak };
 }
 
 function clearDragPreview() {
@@ -1052,7 +1076,7 @@ function tryMove(toIndex) {
 
   if (!shared || shared.length === 0) {
     const isRepeatFailure = hasRepeatedFailedMove(fromIndex, toIndex);
-    addTrace(fromIndex, toIndex, false);
+    addTrace(fromIndex, toIndex, false, "move", !isRepeatFailure);
     addPopup(fromIndex, toIndex, "No shared movie", "bad");
     if (!isRepeatFailure) {
       state.missesLeft -= 1;
@@ -1271,8 +1295,15 @@ function onBoardPointerCancel(e) {
 
 function createShareText() {
   const guessBoxes = Array.from({ length: MAX_MISSES }, (_, i) => (i < state.failedMoves ? "🟥" : "🟩")).join("");
+  const { longestStreak, openingStreak } = getMoveStreakStats();
   const title = `CelebriGrid #${state.dayNumber}`;
-  return [title, SHARE_GAME_URL, guessBoxes].join("\n");
+  return [
+    title,
+    SHARE_GAME_URL,
+    guessBoxes,
+    `Longest streak without a miss: ${longestStreak}`,
+    `Starting streak without a miss: ${openingStreak}`
+  ].join("\n");
 }
 
 async function onShare() {
