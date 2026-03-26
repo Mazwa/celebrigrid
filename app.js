@@ -6,7 +6,7 @@ const FAKE_MOVIES_PER_ROUND = 10;
 const SOLVER_ATTEMPTS = 220;
 const SHARE_GAME_URL = "https://mazwa.github.io/celebrigrid/";
 const DAILY_EPOCH_KEY = "2026-03-23";
-const DAILY_BOARD_VERSION = 3;
+const DAILY_BOARD_VERSION = 4;
 
 const FAKE_ACTORS = Array.from({ length: ACTOR_COUNT }, (_, i) => `Actor ${String(i + 1).padStart(2, "0")}`);
 
